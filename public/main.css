@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Dancing+Script:wght@400;500;600;700&family=Play:wght@400;700&family=Poppins:wght@500&family=Roboto+Mono:wght@100;500&display=swap');
+/* font-family: 'Cherry Bomb One', cursive;
+font-family: 'Dancing Script', cursive;
+font-family: 'Play', sans-serif;
+font-family: 'Poppins', sans-serif;
+font-family: 'Roboto Mono', monospace; */
+*{
+    padding: 0;
+    margin: 0;
+    font-family: 'Play', sans-serif;
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.LogScreen{
+    border-radius: 25px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    width: 500px;
+    height: 500px;
+    background: linear-gradient(45deg,rgb(3, 130, 226),rgb(68, 214, 68));
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+.LogScreen *{
+    padding: 20px;
+    font-size: 2rem;
+}
+.LogScreen button{
+    border: none;
+    border-radius: 25px;
+}
+.LogScreen button:hover{
+    background: #ccc;
+    cursor: pointer;
+}
+.LogScreen h1{
+    color: white;
+    font-size: 3rem;
+}

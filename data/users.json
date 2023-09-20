@@ -1,0 +1,20 @@
+{
+    "users": [
+        {
+            "name": "JP",
+            "posX": 250,
+            "posY": 250,
+            "Coins": 0,
+            "Token": "b09c2e20-2a9a-419b-bd42-e6b33317dc2b",
+            "Color": "red"
+        },
+        {
+            "name": "MAGO",
+            "posX": 200,
+            "posY": 250,
+            "Coins": 0,
+            "Token": "4b12029a-3da5-4056-97dd-73522c73bb71",
+            "Color": "red"
+        }
+    ]
+}

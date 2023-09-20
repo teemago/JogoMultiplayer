@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-Br">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Home</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+</head>
+<body>
+    <section class="LogScreen">
+        <h1>Entrar</h1>
+        <input placeholder="Usuario" id="InputUser">
+        <button id="EnterBtn">Entrar</button>
+    </section>
+    <section class="GameScreen">
+
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let LogBtn = document.querySelector("#EnterBtn")
+        LogBtn.addEventListener("click",function(){
+            let input = document.querySelector("#InputUser")
+            if(input.value){
+                let json = {
+                "user" : input.value
+                }
+                input.value = ''
+                Login(json)
+            }
+            async function Login(json){
+                const dados = await fetch('../login',{
+                    method: "GET",
+                    headers: {
+                        "data" : JSON.stringify(json)
+                    }
+                });
+                resposta = await dados.json();
+                if(resposta){
+                    localStorage.setItem("token",resposta.Token)
+                    window.location.href = '../play?token=' + resposta.Token
+                }
+            }
+        })
+    </script>
+</body>
+</html>

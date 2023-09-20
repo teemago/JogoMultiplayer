@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Game</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+    <script>
+        const token = localStorage.getItem('token')
+        const socket = io();
+
+        // Quando a conexão com o servidor é estabelecida
+        socket.on('connect', () => {
+            socket.emit('data', player.name);
+        });
+        socket.on('updatePlayers',(data) => {
+            console.log(data)
+            // LoadPlayers(data)
+        })
+        let player
+
+        async function buscardados(){
+            let json = {
+                "token" : token
+            }
+            const dados = await fetch('../user',{
+                    method: "GET",
+                    headers: {
+                        "data" : JSON.stringify(json)
+                    }
+                });
+            resposta = await dados.json();
+            player = resposta
+            construir()
+        }
+
+        function construir(){
+            const canvas = document.querySelector('canvas')
+            canvas.height = document.querySelector("body").clientHeight
+            canvas.width = document.querySelector("body").clientWidth
+            // Obtém o contexto 2D do Canvas
+            const ctx = canvas.getContext("2d");
+
+            // Define as propriedades do retângulo
+            const x = player.posX;
+            const y = player.posY;
+            const largura = 50;
+            const altura = 50;
+            const cor = player.Color;
+
+            // ctx.fillStyle = 'red';
+            // ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Desenha o retângulo
+            ctx.fillStyle = cor;
+            ctx.fillRect(x, y, largura, altura);
+            ctx.fillStyle = 'black';
+            ctx.font = "30px Arial";
+            ctx.fillText(player.name, x + 7 , y + 37);
+        }
+
+        buscardados()
+    </script>
+</body>
+</html>
