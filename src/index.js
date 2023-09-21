@@ -27,6 +27,7 @@ S.io.on('connection', (socket) => {
         }
         let puxar = await AdquirePlayerLogStats()
         S.io.emit("updatePlayers", puxar)
+        console.log(isLoged);
     });
 
     socket.on('disconnect',async () => {

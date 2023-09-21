@@ -1,147 +1,155 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Game</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-        * {
-            padding: 0;
-            margin: 0;
-        }
-
-        body {
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-        }
+      body {
+        margin: 0;
+        top: 0;
+      }
+      canvas {
+        background-color: rgb(128, 140, 173);
+      }
+      .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgb(182, 204, 223);
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <div class="container" id="container">
-
-    </div>
+  <body>
+    <div class="container" id="container"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
     <script>
-        const token = localStorage.getItem('token')
-        const socket = io();
+      const token = localStorage.getItem("token");
+      const socket = io();
 
-        // Quando a conexão com o servidor é estabelecida
-        socket.on('connect', () => {
-            setTimeout(() => {
-                socket.emit('data', player.name);
-            }, 1000)
+      // Quando a conexão com o servidor é estabelecida
+      socket.on("connect", () => {
+        setTimeout(() => {
+          socket.emit("data", player.name);
+        }, 1000);
+      });
+      socket.on("updatePlayers", (data) => {
+        console.log(data);
+        players = {};
+        LoadPlayers(data);
+      });
+      let player;
+
+      async function buscardados() {
+        let json = {
+          token: token,
+        };
+        const dados = await fetch("../user", {
+          method: "GET",
+          headers: {
+            data: JSON.stringify(json),
+          },
         });
-        socket.on('updatePlayers', (data) => {
-            console.log(data)
-            players = {}
-            LoadPlayers(data)
-        })
-        let player
+        resposta = await dados.json();
+        player = resposta;
+      }
 
-        async function buscardados() {
-            let json = {
-                "token": token
-            }
-            const dados = await fetch('../user', {
-                method: "GET",
-                headers: {
-                    "data": JSON.stringify(json)
-                }
-            });
-            resposta = await dados.json();
-            player = resposta
-        }
+      const container = document.getElementById("container");
+      var players = {};
 
-        const container = document.getElementById("container");
-        var players = {
+      function LoadPlayers(data) {
+        myGameArea.start();
+        data.forEach((player) => {
+          players[player.name] = new Square(
+            player.name,
+            50,
+            player.posX,
+            player.posY,
+            player.Color
+          );
+        });
+      }
+
+      var myGameArea = {
+        canvas: document.createElement("canvas"),
+        start: function () {
+          const WIDTH = 1000,
+            HEIGHT = 600;
+          this.canvas.width = WIDTH;
+          this.canvas.height = HEIGHT;
+          this.context = this.canvas.getContext("2d");
+          container.appendChild(this.canvas);
+          this.interval = setInterval(updateGameArea, 7);
+        },
+        clear: function () {
+          this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        },
+      };
+
+      function Square(name, width, x, y, color) {
+        this.name = name;
+        this.x = x;
+        this.y = y;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.color = color;
+        this.update = function () {
+          ctx = myGameArea.context;
+          ctx.fillStyle = this.color;
+          ctx.fillRect(this.x, this.y, width, width);
+          socket.emit("positionUpdate", [this.x, this.y]);
         };
-
-        function LoadPlayers(data) {
-            myGameArea.start();
-            data.forEach(player => {
-                players[player.name] = new Square(50, player.posX, player.posY, player.Color);
-            });
-        }
-
-        var myGameArea = {
-            canvas: document.createElement("canvas"),
-            start: function () {
-                const WIDTH = 1200,
-                    HEIGHT = 1000;
-                this.canvas.width = WIDTH;
-                this.canvas.height = HEIGHT;
-                this.context = this.canvas.getContext("2d");
-                container.appendChild(this.canvas);
-                this.interval = setInterval(updateGameArea, 7);
-            },
-            clear: function () {
-                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            },
+        this.newPos = function () {
+          this.x += this.speedX;
+          this.y += this.speedY;
         };
+      }
 
-        function Square(width, x, y, color) {
-            this.x = x;
-            this.y = y;
-            this.speedX = 0;
-            this.speedY = 0;
-            this.color = color;
-            this.update = function () {
-                ctx = myGameArea.context;
-                ctx.fillStyle = this.color;
-                ctx.fillRect(x, y, width, width);
-            };
-            this.newPos = function () {
-                this.x += this.speedX;
-                this.y += this.speedY;
-            }
-        };
-
-        function updateGameArea() {
-            myGameArea.clear();
-            for (const player in players) {
-                players[player].newPos();
-                players[player].update();
-            }
+      function updateGameArea() {
+        myGameArea.clear();
+        for (const player in players) {
+          players[player].newPos();
+          players[player].update();
         }
-        addEventListener("keydown", function (e) {
-            switch (e.key) {
-                case "ArrowRight":
-                    for (const player in players) {
-                        if(players[player] === player.name) {
-                            console.log("batata")
-                            players[player].speedX += 1;
-                        }
-                    }
-                    break;
-                case "ArrowLeft":
-                    for (const player in players) {
-                        if(players[player] === player.name) {
-                            players[player].speedX -= 1;
-                        }
-                    }
-                    break;
-                case "ArrowUp":
-                    for (const player in players) {
-                        if(players[player] === player.name) {
-                            players[player].speedY -= 1;
-                        }
-                    }
-                    break;
-                case "ArrowDown":
-                    for (const player in players) {
-                        if(players[player] === player.name) {
-                            players[player].speedY += 1;
-                        }
-                    }
-                    break;
+      }
+
+      addEventListener("keydown", function (e) {
+        switch (e.key) {
+          case "ArrowRight":
+            for (const square in players) {
+              if (square === player.name) {
+                players[square].speedX += 1;
+              }
             }
-        })
-        buscardados()
+            break;
+          case "ArrowLeft":
+            for (const square in players) {
+              if (square === player.name) {
+                players[square].speedX -= 1;
+              }
+            }
+            break;
+          case "ArrowUp":
+          for (const square in players) {
+              if (square === player.name) {
+                players[square].speedY -= 1;
+              }
+            }
+            break;
+          case "ArrowDown":
+            for (const square in players) {
+              if (square === player.name) {
+                players[square].speedY += 1;
+              }
+            }
+            break;
+        }
+      });
+      buscardados();
     </script>
-</body>
-
+  </body>
 </html>
